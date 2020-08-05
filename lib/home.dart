@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:swikar_inventory/models/item.dart';
-// import 'package:swikar_inventory/models/store.dart';
+import 'package:swikar_inventory/models/store.dart';
+import 'package:email_validator/email_validator.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -8,8 +9,92 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  List<String> titles = ["Etiquetas Rectangulares:", "Etiquetas Circulares:", "Bolsas Zipper:", "Bolsas PP:", "Palitos Para Chupetes:", "Amarres:",
-  "Otros:", "Cajas y Empaques:", "Insumos Básicos:", "Colores:", "Sabores:", "Frascos:", "Producto Terminado:"];
+  final List<String> amounts = List<String>();
+
+  final List<TextEditingController> controllers = List<TextEditingController>();
+  final addressController = TextEditingController();
+
+  @override
+  void dispose() {
+    addressController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _showExportDialog(
+      Store store, List<Item> items) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Exportar Inventario'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text(
+                    'Por favor ingresa una dirección de correo para enviar el archivo, o presiona No enviar para guardar el inventario en tu dispositivo solamente'),
+                TextField(
+                  controller: addressController,
+                  decoration: InputDecoration(
+                    hintText: 'Dirección de correo',
+                    hintStyle: TextStyle(color: Colors.grey),
+                  ),
+                )
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            FlatButton(
+              child: Text(
+                'Cancelar',
+                style: TextStyle(
+                    color: Colors.cyan,
+                    fontSize: 15.0,
+                    fontWeight: FontWeight.bold),
+              ),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            RaisedButton(
+              color: Colors.cyan,
+              child: Text(
+                'Enviar',
+                style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 15.0),
+              ),
+              onPressed: () {
+                String address = addressController.text;
+
+                if (address.isNotEmpty && EmailValidator.validate(address)) {
+                  store.writeCsv(items, address);
+                  Navigator.of(context).pop();
+                }
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  List<String> titles = [
+    "Etiquetas Rectangulares:",
+    "Etiquetas Circulares:",
+    "Bolsas Zipper:",
+    "Bolsas PP:",
+    "Palitos Para Chupetes:",
+    "Amarres:",
+    "Otros:",
+    "Cajas y Empaques:",
+    "Insumos Básicos:",
+    "Colores:",
+    "Sabores:",
+    "Frascos:",
+    "Producto Terminado:"
+  ];
   List<List<Item>> items = [
     [
       Item(
@@ -610,6 +695,19 @@ class _HomeState extends State<Home> {
           )
         ],
       ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () async {
+          List<Item> itemList = List<Item>();
+          for(var i = 0; i < items.length; i++){
+            for(var j = 0; j < items[i].length; j++){
+              itemList.add(items[i][j]);
+            }
+          }
+          _showExportDialog(Store(), itemList);
+        },
+        child: Icon(Icons.check),
+        backgroundColor: Colors.cyan,
+      ),
     );
   }
 }
@@ -634,7 +732,76 @@ class ListTitle extends StatelessWidget {
   }
 }
 
+
+class ListViewTile extends StatefulWidget {
+
+  final Item item;
+
+  const ListViewTile({this.item});
+
+  @override
+  _ListViewTileState createState() => _ListViewTileState();
+}
+
+class _ListViewTileState extends State<ListViewTile> {
+
+  final controller = TextEditingController();
+
+
+  @override
+  void initState() {
+    super.initState();
+    controller.addListener(() {widget.item.amount = int.parse(controller.text);});
+  }
+
+  @override
+  void dispose() {
+    // Clean up the controller when the widget is removed from the
+    // widget tree.
+    controller.dispose();
+    super.dispose();
+  }
+
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+        padding: const EdgeInsets.fromLTRB(10, 0, 50, 0),
+        child: Container(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              Container(
+                width: 300,
+                child:
+                Wrap(direction: Axis.horizontal, children: <Widget>[
+                  Text(
+                    widget.item.name,
+                    style: TextStyle(
+                      fontSize: 15,
+                    ),
+                  ),
+                ]),
+              ),
+              Container(
+                width: 50,
+                child: TextField(
+                  controller: controller,
+                  decoration: InputDecoration(
+                    hintText: widget.item.unit,
+                    hintStyle: TextStyle(color: Colors.grey),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ));
+  }
+}
+
+
 class CustomListView extends StatelessWidget {
+
   const CustomListView({
     Key key,
     @required this.list,
@@ -649,36 +816,7 @@ class CustomListView extends StatelessWidget {
         shrinkWrap: true,
         itemCount: list.length,
         itemBuilder: (context, index) {
-          return Padding(
-              padding: const EdgeInsets.fromLTRB(10, 0, 50, 0),
-              child: Container(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: <Widget>[
-                    Container(
-                      width: 300,
-                      child:
-                          Wrap(direction: Axis.horizontal, children: <Widget>[
-                        Text(
-                          list[index].name,
-                          style: TextStyle(
-                            fontSize: 15,
-                          ),
-                        ),
-                      ]),
-                    ),
-                    Container(
-                      width: 50,
-                      child: TextField(
-                        decoration: InputDecoration(
-                          hintText: list[index].unit,
-                          hintStyle: TextStyle(color: Colors.grey),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ));
+          return ListViewTile(item: list[index]);
         });
   }
 }
