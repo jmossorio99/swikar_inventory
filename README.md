@@ -1,17 +1,12 @@
 # swikar_inventory
 
-A new Flutter project.
+This is an application developed using Flutter for iOS and Android. The application was developed for the company Swikar and it is used to create monthly inventory reports.
+The previous version of this app was developed using MIT's AppInventor. This version is my first Flutter project and it still needs a lot of improvement but it served the purpose of upgrading the app and it was a good way of learning a little bit of Flutter and Dart.
 
-## Getting Started
 
-This project is a starting point for a Flutter application.
+## Description
 
-A few resources to get you started if this is your first Flutter project:
+For the moment, the app lets the user enter the amount of a product that is available and it then generates a CSV file and automatically prompts an email form for the user to send the CSV Inventory file to whom ever he or she wants.
 
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
-
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+I plan to add a data base to manage the actual live inventory of Swikar. With this data base it would be posible to also update the inventory when an order arrives and when the inventory is refilled. It would also be possible to automatically generate the inventory report with a set frequency defined by the user.
 # swikar_inventory
