@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:swikar_inventory/home.dart';
+import 'package:swikar_inventory/pages/home.dart';
 
 void main() {
   runApp(MaterialApp(

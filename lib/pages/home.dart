@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:swikar_inventory/models/item.dart';
 import 'package:swikar_inventory/models/store.dart';
 import 'package:email_validator/email_validator.dart';
+import 'package:swikar_inventory/pages/edit.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -20,8 +21,7 @@ class _HomeState extends State<Home> {
     super.dispose();
   }
 
-  Future<void> _showExportDialog(
-      Store store, List<Item> items) async {
+  Future<void> _showExportDialog(Store store, List<Item> items) async {
     return showDialog<void>(
       context: context,
       barrierDismissible: false, // user must tap button!
@@ -32,7 +32,7 @@ class _HomeState extends State<Home> {
             child: ListBody(
               children: <Widget>[
                 Text(
-                    'Por favor ingresa una dirección de correo para enviar el archivo, o presiona No enviar para guardar el inventario en tu dispositivo solamente'),
+                    'Por favor ingresa una dirección de correo para enviar el archivo, o presiona cancelar para guardar el inventario en tu dispositivo solamente'),
                 TextField(
                   controller: addressController,
                   decoration: InputDecoration(
@@ -95,6 +95,23 @@ class _HomeState extends State<Home> {
     "Frascos:",
     "Producto Terminado:"
   ];
+
+  List<String> names = [
+    "etq_rect",
+    "etq_circ",
+    "bolsa_zipp",
+    "bolsa_pp",
+    "palitos_chupete",
+    "amarres",
+    "otros",
+    "cajas_y_empaques",
+    "in_basicos",
+    "colores",
+    "sabores",
+    "frascos",
+    "prod_terminado"
+  ];
+
   List<List<Item>> items = [
     [
       Item(
@@ -647,7 +664,6 @@ class _HomeState extends State<Home> {
       appBar: AppBar(
         backgroundColor: Colors.pink[400],
         title: Text('Inventario Swikar'),
-        centerTitle: true,
       ),
       body: Column(
         mainAxisSize: MainAxisSize.max,
@@ -687,7 +703,7 @@ class _HomeState extends State<Home> {
                   return Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      ListTitle(title: titles[index]),
+                      CustomListTitle(title: titles[index]),
                       CustomListView(list: items[index])
                     ],
                   );
@@ -698,8 +714,8 @@ class _HomeState extends State<Home> {
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
           List<Item> itemList = List<Item>();
-          for(var i = 0; i < items.length; i++){
-            for(var j = 0; j < items[i].length; j++){
+          for (var i = 0; i < items.length; i++) {
+            for (var j = 0; j < items[i].length; j++) {
               itemList.add(items[i][j]);
             }
           }
@@ -712,8 +728,8 @@ class _HomeState extends State<Home> {
   }
 }
 
-class ListTitle extends StatelessWidget {
-  const ListTitle({Key key, @required this.title}) : super(key: key);
+class CustomListTitle extends StatelessWidget {
+  const CustomListTitle({Key key, @required this.title}) : super(key: key);
 
   final String title;
 
@@ -732,9 +748,7 @@ class ListTitle extends StatelessWidget {
   }
 }
 
-
 class ListViewTile extends StatefulWidget {
-
   final Item item;
 
   const ListViewTile({this.item});
@@ -744,14 +758,14 @@ class ListViewTile extends StatefulWidget {
 }
 
 class _ListViewTileState extends State<ListViewTile> {
-
   final controller = TextEditingController();
-
 
   @override
   void initState() {
     super.initState();
-    controller.addListener(() {widget.item.amount = int.parse(controller.text);});
+    controller.addListener(() {
+      widget.item.amount = int.parse(controller.text);
+    });
   }
 
   @override
@@ -761,7 +775,6 @@ class _ListViewTileState extends State<ListViewTile> {
     controller.dispose();
     super.dispose();
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -773,8 +786,7 @@ class _ListViewTileState extends State<ListViewTile> {
             children: <Widget>[
               Container(
                 width: 300,
-                child:
-                Wrap(direction: Axis.horizontal, children: <Widget>[
+                child: Wrap(direction: Axis.horizontal, children: <Widget>[
                   Text(
                     widget.item.name,
                     style: TextStyle(
@@ -799,9 +811,7 @@ class _ListViewTileState extends State<ListViewTile> {
   }
 }
 
-
 class CustomListView extends StatelessWidget {
-
   const CustomListView({
     Key key,
     @required this.list,

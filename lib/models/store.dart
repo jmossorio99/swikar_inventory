@@ -11,7 +11,6 @@ class Store {
 
   Future<String> get _localPath async {
     final directory = await getApplicationSupportDirectory();
-
     return directory.path;
   }
 
